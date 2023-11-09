@@ -55,7 +55,7 @@ public class ChatServer {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String message;
                 while ((message = in.readLine()) != null) {
-                    System.out.println("수신: " + message);
+                    System.out.println(message);
                     broadcastMessage(message);
                 }
             } catch (IOException e) {
@@ -76,7 +76,7 @@ public class ChatServer {
         private void broadcastMessage(String message) {
             synchronized (clientWriters) {
                 for (PrintWriter writer : clientWriters) {
-                    writer.println("수신: " + message);
+                    writer.println(message);
                 }
             }
         }
