@@ -22,7 +22,6 @@ public class ChatServer {
                     String username = scanner.nextLine();
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                     clientMap.put(writer, username);
-
                     broadcastMessage(username+"님이 입장했습니다.");
 
                     Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
