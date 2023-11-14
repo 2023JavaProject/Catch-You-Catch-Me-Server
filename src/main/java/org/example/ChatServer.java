@@ -1,88 +1,83 @@
 package org.example;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
 
 public class ChatServer {
     private static final int PORT = 8090;
-    private static Set<PrintWriter> clientWriters = new HashSet<>();
-    private static ExecutorService clientHandlerThreadPool = Executors.newCachedThreadPool();
-    private Socket serverSocket;
-    private static boolean isOn = false;
-    public ChatServer() {
-        System.out.println("채팅 서버 시작...");
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-//            serverSocket.setReuseAddress(true);
+    private static Map<PrintWriter, String> clientMap = new HashMap<>();
+
+    public static void main(String[] args) {
+        try {
+            ServerSocket serverSocket = new ServerSocket(PORT);
+
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
-                clientHandlerThreadPool.execute(clientHandler);
+
+                Scanner scanner = new Scanner(clientSocket.getInputStream());
+                if (scanner.hasNextLine()) {
+                    String username = scanner.nextLine();
+                    PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
+                    clientMap.put(writer, username);
+
+                    broadcastMessage(username+"님이 입장했습니다.");
+
+                    Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
+                    t.start();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static class ClientHandler implements Runnable {
-        private Socket socket;
-        private PrintWriter out;
+    // 채팅
+    public static void broadcastMessage(String sender, String message) {
+        for (PrintWriter writer : clientMap.keySet()) {
+            writer.println(sender + ": " + message);
+            writer.flush();
+        }
+    }
 
-        public ClientHandler(Socket socket) {
+    // 출입 안내 문구
+    public static void broadcastMessage(String message) {
+        for (PrintWriter writer : clientMap.keySet()) {
+            writer.println(message);
+            writer.flush();
+        }
+    }
 
-            this.socket = socket;
+    static class ClientHandler implements Runnable {
+        private Socket clientSocket;
+        private PrintWriter writer;
+        private String username;
+
+        public ClientHandler(Socket socket, PrintWriter writer, String username) {
+            this.clientSocket = socket;
+            this.writer = writer;
+            this.username = username;
         }
 
         @Override
         public void run() {
             try {
-                out = new PrintWriter(socket.getOutputStream(), true);
+                Scanner scanner = new Scanner(clientSocket.getInputStream());
 
-                synchronized (clientWriters) {
-                    clientWriters.add(out);
+                while (scanner.hasNextLine()) {
+                    String message = scanner.nextLine();
+                    broadcastMessage(username, message);
                 }
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String message;
-                while ((message = in.readLine()) != null) {
-                    System.out.println(message);
-                    broadcastMessage(message);
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                synchronized (clientWriters) {
-                    clientWriters.remove(out);
-                }
+                // 나간 유저를 맵에서 제거하고 안내문구 출력
+                clientMap.remove(writer);
+                broadcastMessage(username+"님이 나가셨습니다.");
             }
         }
-
-        private void broadcastMessage(String message) {
-            synchronized (clientWriters) {
-                for (PrintWriter writer : clientWriters) {
-                    writer.println(message);
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        new ChatServer();
     }
 }
