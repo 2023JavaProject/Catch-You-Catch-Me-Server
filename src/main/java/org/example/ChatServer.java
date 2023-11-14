@@ -73,7 +73,7 @@ public class ChatServer {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                // 나간 유저를 맵에서 제거하고 안내문구 출력
+                // 나간 유저를 맵에서 제거, 안내문구 출력
                 clientMap.remove(writer);
                 broadcastMessage(username+"님이 나가셨습니다.");
             }
