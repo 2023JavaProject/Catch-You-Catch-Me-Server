@@ -23,7 +23,7 @@ public class ChatServer {
                     String username = scanner.nextLine();
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                     clientMap.put(writer, username);
-                    broadcastMessage(username+"님이 입장했습니다.");
+                    broadcastMessage(username + "님이 입장했습니다.");
 
                     Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
                     t.start();
@@ -34,6 +34,7 @@ public class ChatServer {
             e.printStackTrace();
         }
     }
+
     // 채팅
     public static void broadcastMessage(String sender, String message) {
         for (PrintWriter writer : clientMap.keySet()) {
@@ -65,11 +66,11 @@ public class ChatServer {
         public void run() {
             try {
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
-                
+
                 while (scanner.hasNextLine()) {
                     String message = scanner.nextLine();
                     // 공백 입력 허용 x
-                    if ( !message.equals("")) {
+                    if (!message.equals("")) {
                         broadcastMessage(username, message);
                     }
                 }
@@ -78,7 +79,7 @@ public class ChatServer {
             } finally {
                 // 나간 유저를 맵에서 제거, 안내문구 출력
                 clientMap.remove(writer);
-                broadcastMessage(username+"님이 나가셨습니다.");
+                broadcastMessage(username + "님이 나가셨습니다.");
             }
 
         }
