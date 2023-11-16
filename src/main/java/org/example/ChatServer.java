@@ -59,7 +59,6 @@ public class ChatServer {
             this.writer = writer;
             this.username = username;
         }
-
         @Override
         public void run() {
             try {
