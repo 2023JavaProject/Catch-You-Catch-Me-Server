@@ -64,7 +64,7 @@ public class ChatServer {
             try {
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
 
-                while (scanner.hasNextLine()) {
+                while (scanner.hasNext()) {
                     String message = scanner.nextLine();
                     broadcastMessage(username, message);
                 }
