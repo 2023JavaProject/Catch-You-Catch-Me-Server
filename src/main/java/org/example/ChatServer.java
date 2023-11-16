@@ -28,6 +28,7 @@ public class ChatServer {
                     Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
                     t.start();
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
