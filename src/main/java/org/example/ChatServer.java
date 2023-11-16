@@ -18,6 +18,7 @@ public class ChatServer {
                 Socket clientSocket = serverSocket.accept();
 
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
+
                 if (scanner.hasNextLine()) {
                     String username = scanner.nextLine();
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
@@ -59,6 +60,7 @@ public class ChatServer {
             this.writer = writer;
             this.username = username;
         }
+
         @Override
         public void run() {
             try {
