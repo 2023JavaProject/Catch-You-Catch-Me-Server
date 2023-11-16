@@ -63,6 +63,13 @@ public class ChatServer {
         }
     }
 
+    public static void broadcastClear(){
+        for (PrintWriter writer : clientMap.keySet()) {
+            writer.println("clear");
+            System.out.println("야야야1111");
+            writer.flush();
+        }
+    }
 
 
     static class ClientHandler implements Runnable {
@@ -85,6 +92,8 @@ public class ChatServer {
                     String message = scanner.nextLine();
                     if (message.startsWith("draw:")) {
                         processDrawingMessage(message);
+                    } else if(message.equals("clear")) {
+                        processClearMessage(message);
                     } else {
                         broadcastMessage(username, message);
                     }
@@ -107,7 +116,13 @@ public class ChatServer {
             int y2 = Integer.parseInt(parts[3]);
             Color color = new Color(Integer.parseInt(parts[4]));
             int penSize = Integer.parseInt(parts[5]);
+
             broadcastDrawing(x1, y1, x2, y2, color, penSize);
+
+        }
+
+        private void processClearMessage(String message){
+            broadcastClear();
         }
     }
 }
