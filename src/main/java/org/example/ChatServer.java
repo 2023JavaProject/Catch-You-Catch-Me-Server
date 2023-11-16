@@ -66,7 +66,7 @@ public class ChatServer {
                 
                 while (scanner.hasNextLine()) {
                     String message = scanner.nextLine();
-                    // 공백 입력은 허용하지 않음
+                    // 공백 입력 허용 x
                     if ( !message.equals("")) {
                         broadcastMessage(username, message);
                     }
