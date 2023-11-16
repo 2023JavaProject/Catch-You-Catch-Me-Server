@@ -34,7 +34,6 @@ public class ChatServer {
             e.printStackTrace();
         }
     }
-
     // 채팅
     public static void broadcastMessage(String sender, String message) {
         for (PrintWriter writer : clientMap.keySet()) {
