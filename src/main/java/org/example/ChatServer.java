@@ -81,7 +81,6 @@ public class ChatServer {
                 clientMap.remove(writer);
                 broadcastMessage(username + "님이 나가셨습니다.");
             }
-
         }
     }
 }
