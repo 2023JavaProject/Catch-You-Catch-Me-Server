@@ -63,9 +63,10 @@ public class ChatServer {
         public void run() {
             try {
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
-
+                
                 while (scanner.hasNextLine()) {
                     String message = scanner.nextLine();
+                    // 공백을 입력하면 입력되지 않도록
                     if ( !message.equals("")) {
                         broadcastMessage(username, message);
                     }
@@ -77,6 +78,7 @@ public class ChatServer {
                 clientMap.remove(writer);
                 broadcastMessage(username+"님이 나가셨습니다.");
             }
+
         }
     }
 }
