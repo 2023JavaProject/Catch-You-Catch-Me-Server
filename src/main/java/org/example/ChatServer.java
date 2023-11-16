@@ -21,17 +21,19 @@ public class ChatServer {
                 Socket clientSocket = serverSocket.accept();
 
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
+
                 if (scanner.hasNextLine()) {
                     String username = scanner.nextLine();
 
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                     clientMap.put(writer, username);
-                    broadcastMessage(username+"님이 입장했습니다.");
+                    broadcastMessage(username + "님이 입장했습니다.");
 
                     // 각 클라이언트를 처리할 핸들러 스레드 시작
                     Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
                     t.start();
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,19 +83,23 @@ public class ChatServer {
 
                 while (scanner.hasNextLine()) {
                     String message = scanner.nextLine();
+<<<<<<< HEAD
                     if (message.startsWith("draw:")) {
                         processDrawingMessage(message);
                     } else {
+=======
+                    // 공백 입력 허용 x
+                    if (!message.equals("")) {
+>>>>>>> 1267117931f6b513c49010a33f48280223fbfd62
                         broadcastMessage(username, message);
                     }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 // 나간 유저를 맵에서 제거, 안내문구 출력
                 clientMap.remove(writer);
-                broadcastMessage(username+"님이 나가셨습니다.");
+                broadcastMessage(username + "님이 나가셨습니다.");
             }
         }
         private void processDrawingMessage(String message) {
