@@ -64,9 +64,11 @@ public class ChatServer {
             try {
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
 
-                while (scanner.hasNext()) {
+                while (scanner.hasNextLine()) {
                     String message = scanner.nextLine();
-                    broadcastMessage(username, message);
+                    if ( !message.equals("")) {
+                        broadcastMessage(username, message);
+                    }
                 }
 
             } catch (IOException e) {
