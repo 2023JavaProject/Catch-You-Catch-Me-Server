@@ -70,7 +70,6 @@ public class ChatServer {
                         broadcastMessage(username, message);
                     }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
