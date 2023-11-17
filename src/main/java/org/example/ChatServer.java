@@ -10,6 +10,7 @@ import java.util.*;
 public class ChatServer {
     private static final int PORT = 8090;
     private static Map<PrintWriter, String> clientMap = new HashMap<>();
+    private static int readyUserCnt = 0;
 
     public static void main(String[] args) {
         try {
@@ -19,11 +20,13 @@ public class ChatServer {
             while (true) {
                 // 클라이언트로의 연결을 기다림
                 Socket clientSocket = serverSocket.accept();
+                readyUserCnt++;
+                System.out.println(readyUserCnt);
 
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
 
                 if (scanner.hasNextLine()) {
-                    String username = scanner.nextLine();
+                    String username = scanner.nextLine().substring(5);
 
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                     clientMap.put(writer, username);
@@ -88,13 +91,17 @@ public class ChatServer {
             try {
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
 
+                writer.println("userCnt:" + readyUserCnt);
+                writer.flush();
+
                 while (scanner.hasNextLine()) {
                     String message = scanner.nextLine();
                     if (message.startsWith("draw:")) {
                         processDrawingMessage(message);
                     } else if(message.equals("clear")) {
                         processClearMessage(message);
-                    } else {
+                    } else if(message.equals("user")){
+                    }else {
                         broadcastMessage(username, message);
                     }
                 }
