@@ -11,6 +11,8 @@ public class ChatServer {
     private static final int PORT = 8090;
     private static Map<PrintWriter, String> clientMap = new HashMap<>();
     private static int readyUserCnt = 0;
+    private static int playUserCnt=0;
+    private static ArrayList<String> nameArr = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -30,7 +32,34 @@ public class ChatServer {
 
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                     clientMap.put(writer, username);
-                    broadcastMessage(username + "님이 입장했습니다.");
+                    // 준비여부 확인
+                    if(nameArr.contains(username)){
+                        playUserCnt++;
+                        System.out.println(playUserCnt);
+                    } else{
+                        nameArr.add(username);
+                    }
+
+                    // 게임시작과 준비에 따라 문구 다르게 출력
+                    if(playUserCnt == 0){
+                        broadcastMessage(username + "님이 입장했습니다.");
+
+                    }
+                    else{
+                        broadcastMessage(username + "님 준비완료.");
+                    }
+
+                    if(nameArr.size() == playUserCnt){
+                        for(int i=1; i<=3; i++) {
+                            try {
+                                Thread.sleep(1500); //1.5초 대기
+                                broadcastMessage(i+"");
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        broadcastMessage("게임시작");
+                    }
 
                     // 각 클라이언트를 처리할 핸들러 스레드 시작
                     Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
