@@ -10,6 +10,9 @@ import java.util.*;
 public class ChatServer {
     private static final int PORT = 8090;
     private static Map<PrintWriter, String> clientMap = new HashMap<>();
+    private static int readyUserCnt = 0;
+    private static int playUserCnt=0;
+    private static ArrayList<String> nameArr = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -19,15 +22,44 @@ public class ChatServer {
             while (true) {
                 // 클라이언트로의 연결을 기다림
                 Socket clientSocket = serverSocket.accept();
+                readyUserCnt++;
+                System.out.println(readyUserCnt);
 
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
 
                 if (scanner.hasNextLine()) {
-                    String username = scanner.nextLine();
+                    String username = scanner.nextLine().substring(5);
 
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                     clientMap.put(writer, username);
-                    broadcastMessage(username + "님이 입장했습니다.");
+                    // 준비여부 확인
+                    if(nameArr.contains(username)){
+                        playUserCnt++;
+                        System.out.println(playUserCnt);
+                    } else{
+                        nameArr.add(username);
+                    }
+
+                    // 게임시작과 준비에 따라 문구 다르게 출력
+                    if(playUserCnt == 0){
+                        broadcastMessage(username + "님이 입장했습니다.");
+
+                    }
+                    else{
+                        broadcastMessage(username + "님 준비완료.");
+                    }
+
+                    if(nameArr.size() == playUserCnt){
+                        for(int i=1; i<=3; i++) {
+                            try {
+                                Thread.sleep(1500); //1.5초 대기
+                                broadcastMessage(i+"");
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        broadcastMessage("게임시작");
+                    }
 
                     // 각 클라이언트를 처리할 핸들러 스레드 시작
                     Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
@@ -63,6 +95,13 @@ public class ChatServer {
         }
     }
 
+    public static void broadcastClear(){
+        for (PrintWriter writer : clientMap.keySet()) {
+            writer.println("clear");
+            System.out.println("야야야1111");
+            writer.flush();
+        }
+    }
 
 
     static class ClientHandler implements Runnable {
@@ -81,11 +120,17 @@ public class ChatServer {
             try {
                 Scanner scanner = new Scanner(clientSocket.getInputStream());
 
+                writer.println("userCnt:" + readyUserCnt);
+                writer.flush();
+
                 while (scanner.hasNextLine()) {
                     String message = scanner.nextLine();
                     if (message.startsWith("draw:")) {
                         processDrawingMessage(message);
-                    } else {
+                    } else if(message.equals("clear")) {
+                        processClearMessage(message);
+                    } else if(message.equals("user")){
+                    }else {
                         broadcastMessage(username, message);
                     }
                 }
@@ -107,7 +152,13 @@ public class ChatServer {
             int y2 = Integer.parseInt(parts[3]);
             Color color = new Color(Integer.parseInt(parts[4]));
             int penSize = Integer.parseInt(parts[5]);
+
             broadcastDrawing(x1, y1, x2, y2, color, penSize);
+
+        }
+
+        private void processClearMessage(String message){
+            broadcastClear();
         }
     }
 }
