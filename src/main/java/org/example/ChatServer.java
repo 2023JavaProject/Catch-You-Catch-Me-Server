@@ -11,8 +11,18 @@ public class ChatServer {
     private static final int PORT = 8090;
     private static Map<PrintWriter, String> clientMap = new HashMap<>();
     private static int readyUserCnt = 0;
-    private static int playUserCnt=0;
+    private static int playUserCnt = 0;
     private static ArrayList<String> nameArr = new ArrayList<>();
+    private static int currentTimeInSeconds = 0;
+
+    //타이머 변수
+    private static int mm;
+    private static int ss;
+    private static int ms;
+    private static int t = 0;
+    private static String currentTime;
+    private static Thread p_display;
+
 
     public static void main(String[] args) {
         try {
@@ -33,27 +43,26 @@ public class ChatServer {
                     PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
                     clientMap.put(writer, username);
                     // 준비여부 확인
-                    if(nameArr.contains(username)){
+                    if (nameArr.contains(username)) {
                         playUserCnt++;
                         System.out.println(playUserCnt);
-                    } else{
+                    } else {
                         nameArr.add(username);
                     }
 
                     // 게임시작과 준비에 따라 문구 다르게 출력
-                    if(playUserCnt == 0){
+                    if (playUserCnt == 0) {
                         broadcastMessage(username + "님이 입장했습니다.");
 
-                    }
-                    else{
+                    } else {
                         broadcastMessage(username + "님 준비완료.");
                     }
 
-                    if(nameArr.size() == playUserCnt){
-                        for(int i=1; i<=3; i++) {
+                    if (nameArr.size() == playUserCnt) {
+                        for (int i = 3; i >= 1; i--) {
                             try {
                                 Thread.sleep(1500); //1.5초 대기
-                                broadcastMessage(i+"");
+                                broadcastMessage(i + "");
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -61,9 +70,13 @@ public class ChatServer {
                         broadcastMessage("게임시작");
                     }
 
+
                     // 각 클라이언트를 처리할 핸들러 스레드 시작
                     Thread t = new Thread(new ClientHandler(clientSocket, writer, username));
                     t.start();
+                    if (nameArr.size() == playUserCnt) {
+                        TimerRuning();
+                    }
                 }
 
             }
@@ -87,6 +100,7 @@ public class ChatServer {
             writer.flush();
         }
     }
+
     public static void broadcastDrawing(int x1, int y1, int x2, int y2, Color color, int penSize) {
         String message = String.format("draw:%d,%d,%d,%d,%d,%d", x1, y1, x2, y2, color.getRGB(), penSize);
         for (PrintWriter writer : clientMap.keySet()) {
@@ -95,14 +109,40 @@ public class ChatServer {
         }
     }
 
-    public static void broadcastClear(){
+    public static void broadcastClear() {
         for (PrintWriter writer : clientMap.keySet()) {
             writer.println("clear");
             System.out.println("야야야1111");
             writer.flush();
         }
     }
+    public static void broadcastTime(PrintWriter writer, String currentTime) {
+            writer.println("Time : " + currentTime);
+            writer.flush();;
+    }
+    public static void TimerRuning() {
+        p_display = new Thread(() -> {
+            while (p_display == Thread.currentThread()) {
+                mm = t % (1000 * 60) / 100 / 60;
+                ss = t % (1000 * 60) / 100 % 60;
 
+                try {
+                    Thread.sleep(10);
+                    t++;
+                    currentTime = String.format("%02d : %02d", mm, ss);
+
+                    for (PrintWriter writer : clientMap.keySet()) {
+                        broadcastTime(writer, currentTime);
+                    }
+
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        p_display.start();
+    }
 
     static class ClientHandler implements Runnable {
         private Socket clientSocket;
@@ -129,7 +169,6 @@ public class ChatServer {
                         processDrawingMessage(message);
                     } else if(message.equals("clear")) {
                         processClearMessage(message);
-                    } else if(message.equals("user")){
                     }else {
                         broadcastMessage(username, message);
                     }
