@@ -186,7 +186,10 @@ public class ChatServer {
                         processDrawingMessage(message);
                     } else if(message.equals("clear")){
                         processClearMessage();
-                    }else {
+                    } else if(message.startsWith("exit")){
+                        processExit(message);
+                    }
+                    else {
                         broadcastMessage(username, message);
                     }
                 }
@@ -214,8 +217,15 @@ public class ChatServer {
         }
 
         private void processClearMessage(){
-
             broadcastClear();
+        }
+
+        private void processExit(String message){
+            String finalMessage = message.substring(8);
+            clientMap.remove(writer);
+            broadcastMessage(username+"님이 나가셨습니다.");;
+            nameArr.removeIf(element -> element.contains(finalMessage));
+            readyUserCnt --;
         }
     }
 }
