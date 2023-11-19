@@ -169,7 +169,10 @@ public class ChatServer {
                         processDrawingMessage(message);
                     } else if(message.equals("clear")) {
                         processClearMessage(message);
-                    }else {
+                    } else if ( message.contains("정답")) {// 유저이름은 빼고 정답 메시지만 나오도록
+                        broadcastMessage(message.substring(0, message.length()));
+                    }
+                    else {
                         broadcastMessage(username, message);
                     }
                 }
