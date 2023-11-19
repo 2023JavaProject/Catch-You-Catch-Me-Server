@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.*;
 import java.util.*;
+
+import static java.sql.DriverManager.getConnection;
 
 public class ChatServer {
     private static final int PORT = 8090;
@@ -23,6 +26,11 @@ public class ChatServer {
     private static String currentTime;
     private static Thread p_display;
 
+    // 제시어 변수
+    private String currentTopic;// 현재 주제
+    private static int providedTopicNum = 0;// 낸 문제 개수
+    private static int processingTopicNum = 0;// 진행중인 문제 개수
+    private static int correctTopicNum = 0;// 맞은 문제 개수
 
     public static void main(String[] args) {
         try {
@@ -77,6 +85,22 @@ public class ChatServer {
                     if (nameArr.size() == playUserCnt) {
                         TimerRuning();
                     }
+
+                    
+                    // 제시어
+                    // 1. 주어진 문제와 맞춘 문제를 알아야 함
+                    // 1. 서버에서 제시어 가져오기.
+                    /**
+                     * 1. 서버에서 제시어를 가져온다.
+                     * 낸 문제. 진행하고 있는 문제. 맞춘문제.
+                     * 진행하고 있는 문제 = 0일 때 낸 문제를 ++해준다. 진행하고 있는 문제는 1로 바꿔준다
+                     * 2. 문제를 맞췄을 경우
+                     * 조건은 message에서 제시어가 contains되어있으면
+                     * 맞춘문제++.
+                     * 진행하고 있는 문제 = 0
+                     * 정답이라는 문구를 써준다.
+                     */
+
                 }
 
             }
@@ -116,10 +140,13 @@ public class ChatServer {
             writer.flush();
         }
     }
+
     public static void broadcastTime(PrintWriter writer, String currentTime) {
-            writer.println("Time : " + currentTime);
-            writer.flush();;
+        writer.println("Time : " + currentTime);
+        writer.flush();
+        ;
     }
+
     public static void TimerRuning() {
         p_display = new Thread(() -> {
             while (p_display == Thread.currentThread()) {
@@ -167,10 +194,12 @@ public class ChatServer {
                     String message = scanner.nextLine();
                     if (message.startsWith("draw:")) {
                         processDrawingMessage(message);
-                    } else if(message.equals("clear")) {
-                        processClearMessage(message);
-                    } else if ( message.contains("정답")) {// 유저이름은 빼고 정답 메시지만 나오도록
+                    } else if (message.equals("clear")) {
+                        broadcastClear();
+                    } else if (message.contains("정답")) {// 유저이름은 빼고 정답 메시지만 나오도록
                         broadcastMessage(message.substring(0, message.length()));
+                    } else if ( message.contains("topic")) {// 제시어
+                        broadcastMessage(message.substring(7));// 제시어만 출력
                     }
                     else {
                         broadcastMessage(username, message);
@@ -182,9 +211,10 @@ public class ChatServer {
             } finally {
                 // 나간 유저를 맵에서 제거, 안내문구 출력
                 clientMap.remove(writer);
-                broadcastMessage(username+"님이 나가셨습니다.");
+                broadcastMessage(username + "님이 나가셨습니다.");
             }
         }
+
         private void processDrawingMessage(String message) {
             // Format: "draw:x1,y1,x2,y2,color,penSize"
             String[] parts = message.substring(5).split(",");
@@ -199,8 +229,12 @@ public class ChatServer {
 
         }
 
-        private void processClearMessage(String message){
-            broadcastClear();
-        }
+//        private void processClearMessage(String message){
+//            broadcastClear();
+//        }
+
     }
+
+
+
 }
