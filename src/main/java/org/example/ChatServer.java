@@ -122,14 +122,13 @@ public class ChatServer {
             if(!playUserName.contains(username))
                 playUserName.add(username);
             writer.println("userName : " + playUserName);
-            writer.flush();
+            //writer.flush();
     }
 
 
     public static void broadcastClear() {
         for (PrintWriter writer : clientMap.keySet()) {
             writer.println("clear");
-            System.out.println("야야야1111");
             writer.flush();
         }
     }
