@@ -118,10 +118,10 @@ public class ChatServer {
     }
 
     public static void broadcastName(PrintWriter writer, String username){
-            if(!playUserName.contains(username))
-                playUserName.add(username);
-            writer.println("userName : " + playUserName);
-            //writer.flush();
+        if(!playUserName.contains(username))
+            playUserName.add(username);
+        writer.println("userName : " + playUserName);
+        //writer.flush();
     }
 
 
@@ -133,8 +133,8 @@ public class ChatServer {
     }
 
     public static void broadcastTime(PrintWriter writer, String currentTime) {
-            writer.println("Time : " + currentTime);
-            writer.flush();;
+        writer.println("Time : " + currentTime);
+        writer.flush();;
     }
 
     public static void TimerRuning() {
@@ -215,7 +215,7 @@ public class ChatServer {
 
         private void processClearMessage(){
 
-                broadcastClear();
+            broadcastClear();
         }
     }
 }
