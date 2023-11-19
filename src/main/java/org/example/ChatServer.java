@@ -13,6 +13,7 @@ public class ChatServer {
     private static int readyUserCnt = 0;
     private static int playUserCnt = 0;
     private static ArrayList<String> nameArr = new ArrayList<>();
+    private static ArrayList<String> playUserName = new ArrayList<>();
     private static int currentTimeInSeconds = 0;
 
     //타이머 변수
@@ -56,12 +57,13 @@ public class ChatServer {
 
                     } else {
                         broadcastMessage(username + "님 준비완료.");
+                        SendName(username);
                     }
 
                     if (nameArr.size() == playUserCnt) {
                         for (int i = 3; i >= 1; i--) {
                             try {
-                                Thread.sleep(1500); //1.5초 대기
+                                Thread.sleep(1000); //1초 대기
                                 broadcastMessage(i + "");
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -82,6 +84,12 @@ public class ChatServer {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void SendName(String username) {
+        for (PrintWriter writer : clientMap.keySet()) {
+            broadcastName(writer, username);
         }
     }
 
@@ -109,17 +117,26 @@ public class ChatServer {
         }
     }
 
+    public static void broadcastName(PrintWriter writer, String username){
+            if(!playUserName.contains(username))
+                playUserName.add(username);
+            writer.println("userName : " + playUserName);
+            //writer.flush();
+    }
+
+
     public static void broadcastClear() {
         for (PrintWriter writer : clientMap.keySet()) {
             writer.println("clear");
-            System.out.println("야야야1111");
             writer.flush();
         }
     }
+
     public static void broadcastTime(PrintWriter writer, String currentTime) {
             writer.println("Time : " + currentTime);
             writer.flush();;
     }
+
     public static void TimerRuning() {
         p_display = new Thread(() -> {
             while (p_display == Thread.currentThread()) {
@@ -167,8 +184,8 @@ public class ChatServer {
                     String message = scanner.nextLine();
                     if (message.startsWith("draw:")) {
                         processDrawingMessage(message);
-                    } else if(message.equals("clear")) {
-                        processClearMessage(message);
+                    } else if(message.equals("clear")){
+                        processClearMessage();
                     }else {
                         broadcastMessage(username, message);
                     }
@@ -196,8 +213,9 @@ public class ChatServer {
 
         }
 
-        private void processClearMessage(String message){
-            broadcastClear();
+        private void processClearMessage(){
+
+                broadcastClear();
         }
     }
 }
