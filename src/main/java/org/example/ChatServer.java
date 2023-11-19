@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Time;
 import java.util.*;
 
 public class ChatServer {
@@ -132,6 +131,7 @@ public class ChatServer {
             writer.flush();
         }
     }
+
     public static void broadcastTime(PrintWriter writer, String currentTime) {
             writer.println("Time : " + currentTime);
             writer.flush();;
@@ -184,8 +184,8 @@ public class ChatServer {
                     String message = scanner.nextLine();
                     if (message.startsWith("draw:")) {
                         processDrawingMessage(message);
-                    } else if(message.equals("clear")) {
-                        processClearMessage(message);
+                    } else if(message.equals("clear")){
+                        processClearMessage();
                     }else {
                         broadcastMessage(username, message);
                     }
@@ -213,8 +213,9 @@ public class ChatServer {
 
         }
 
-        private void processClearMessage(String message){
-            broadcastClear();
+        private void processClearMessage(){
+
+                broadcastClear();
         }
     }
 }
