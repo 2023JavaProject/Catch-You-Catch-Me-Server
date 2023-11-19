@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Time;
 import java.util.*;
 
 public class ChatServer {
@@ -13,6 +14,7 @@ public class ChatServer {
     private static int readyUserCnt = 0;
     private static int playUserCnt = 0;
     private static ArrayList<String> nameArr = new ArrayList<>();
+    private static ArrayList<String> playUserName = new ArrayList<>();
     private static int currentTimeInSeconds = 0;
 
     //타이머 변수
@@ -56,6 +58,7 @@ public class ChatServer {
 
                     } else {
                         broadcastMessage(username + "님 준비완료.");
+                        SendName(username);
                     }
 
                     if (nameArr.size() == playUserCnt) {
@@ -85,6 +88,12 @@ public class ChatServer {
         }
     }
 
+    private static void SendName(String username) {
+        for (PrintWriter writer : clientMap.keySet()) {
+            broadcastName(writer, username);
+        }
+    }
+
     // 채팅
     public static void broadcastMessage(String sender, String message) {
         for (PrintWriter writer : clientMap.keySet()) {
@@ -109,6 +118,14 @@ public class ChatServer {
         }
     }
 
+    public static void broadcastName(PrintWriter writer, String username){
+            if(!playUserName.contains(username))
+                playUserName.add(username);
+            writer.println("userName : " + playUserName);
+            writer.flush();
+    }
+
+
     public static void broadcastClear() {
         for (PrintWriter writer : clientMap.keySet()) {
             writer.println("clear");
@@ -120,6 +137,7 @@ public class ChatServer {
             writer.println("Time : " + currentTime);
             writer.flush();;
     }
+
     public static void TimerRuning() {
         p_display = new Thread(() -> {
             while (p_display == Thread.currentThread()) {
