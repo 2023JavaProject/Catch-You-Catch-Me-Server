@@ -61,7 +61,7 @@ public class ChatServer {
                     if (nameArr.size() == playUserCnt) {
                         for (int i = 3; i >= 1; i--) {
                             try {
-                                Thread.sleep(1500); //1.5초 대기
+                                Thread.sleep(1000); //1초 대기
                                 broadcastMessage(i + "");
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
