@@ -237,8 +237,8 @@ public class ChatServer {
                 e.printStackTrace();
             } finally {
                 // 나간 유저를 맵에서 제거, 안내문구 출력
-                clientMap.remove(writer);
-                broadcastMessage(username+"님이 나가셨습니다.");
+                //clientMap.remove(writer);
+                //broadcastMessage(username+"님이 나가셨습니다.");
             }
         }
         private void processDrawingMessage(String message) {
