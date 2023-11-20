@@ -203,6 +203,8 @@ public class ChatServer {
                         processClearMessage();
                     } else if(message.startsWith("exit")){
                         processExit(message);
+                    } else if(message.startsWith("topic")){
+                        setTopic();
                     }
                     else {
                         broadcastMessage(username, message);
