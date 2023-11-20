@@ -25,6 +25,15 @@ public class ChatServer {
     private static String currentTime;
     private static Thread p_display;
 
+<<<<<<< HEAD
+    // 제시어
+    private static boolean isUsedChance = false;// 제시어변경 완료
+    private static ArrayList<String> topicArr = new ArrayList<>();
+    private static ArrayList<String> topicUsedArr = new ArrayList<>();
+    private static String currentTopic;
+    private static int correctTopicNum = 0;
+    private static int clearTopicNum = 5;
+    private static boolean isInit = false;
     private static int rightCnt = 0;
 
 
@@ -83,6 +92,17 @@ public class ChatServer {
                     if (nameArr.size() == playUserCnt) {
                         TimerRuning();
                         setTopic();
+                    }
+
+                    // 제시어 초기화 여부 확인
+                    if ( !isInit ) {
+                        // 제시어 초기화
+                        for (String s : topics) {
+                            topicArr.add(s);
+                            System.out.println(s);
+                        }
+                        ClientHandler.changeTopic();// 제시어 기초 세팅
+                        isInit = true;
                     }
                 }
 
@@ -241,6 +261,18 @@ public class ChatServer {
                 broadcastMessage(username+"님이 나가셨습니다.");
             }
         }
+        static void changeTopic() {
+            // currentTopic을 초기화
+            currentTopic = topicArr.get((int) (Math.random() * topicArr.size()));
+
+            // 제시어 중복 확인
+            while (topicUsedArr.contains(currentTopic)) {
+                currentTopic = topicArr.get((int) (Math.random() * topicArr.size()));
+            }
+            System.out.println("중복이 아닙니다."+currentTopic);
+            topicUsedArr.add(currentTopic);
+        }
+
         private void processDrawingMessage(String message) {
             // Format: "draw:x1,y1,x2,y2,color,penSize"
             String[] parts = message.substring(5).split(",");
