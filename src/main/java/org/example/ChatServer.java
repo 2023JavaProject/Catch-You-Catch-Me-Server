@@ -25,6 +25,8 @@ public class ChatServer {
     private static String currentTime;
     private static Thread p_display;
 
+    private static int rightCnt = 0;
+
 
     public static void main(String[] args) {
         try {
@@ -71,6 +73,7 @@ public class ChatServer {
                             }
                         }
                         broadcastMessage("게임시작");
+                        sendRepaint();
                     }
 
 
@@ -92,6 +95,12 @@ public class ChatServer {
     private static void SendName(String username) {
         for (PrintWriter writer : clientMap.keySet()) {
             broadcastName(writer, username);
+        }
+    }
+
+    private static void sendRepaint(){
+        for (PrintWriter writer : clientMap.keySet()) {
+            broadcastRepaint(writer);
         }
     }
 
@@ -140,7 +149,17 @@ public class ChatServer {
     }
     public static void broadcastTopic(PrintWriter writer, String topics){
         writer.println("Topic : " + topics);
+        writer.flush();
+    }
+
+    public static void broadcastRepaint(PrintWriter writer){
+        writer.println("repaint");
         writer.flush();;
+    }
+
+    public static void broadcastRight(PrintWriter writer, int rightCnt){
+        writer.println("right : " + rightCnt);
+        writer.flush();
     }
     public static void TimerRuning() {
         p_display = new Thread(() -> {
@@ -205,6 +224,9 @@ public class ChatServer {
                         processExit(message);
                     } else if(message.startsWith("topic")){
                         setTopic();
+                    } else if(message.equals("right")){
+                        rightCnt++;
+                        processRight(rightCnt);
                     }
                     else {
                         broadcastMessage(username, message);
@@ -235,6 +257,12 @@ public class ChatServer {
 
         private void processClearMessage(){
             broadcastClear();
+        }
+
+        private void processRight(int rightCnt){
+            for (PrintWriter writer : clientMap.keySet()) {
+                broadcastRight(writer, rightCnt);
+            }
         }
 
         private void processExit(String message){
