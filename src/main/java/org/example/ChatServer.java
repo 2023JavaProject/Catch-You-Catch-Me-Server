@@ -15,6 +15,7 @@ public class ChatServer {
     private static ArrayList<String> nameArr = new ArrayList<>();
     private static ArrayList<String> playUserName = new ArrayList<>();
     private static int currentTimeInSeconds = 0;
+    static String[] topics = "퇴학,우거지,피고인,핵가족,연장전,포크레인,바이오리듬,삼국시대,시험관아기,풍년,새우젓,프라이드 치킨,열매,소방관,전사자,태양,카레이서,개인기,가로수,사시나무,쥐불놀이,가격표,공중전화,불똥,양반,양팔,잠수,초등학교,철종경기,코너킥,티눈,귓속말,백수,원빈,줄다리기,토양,초음파검사,창조물,창업자,작은북,중고생,손맛".split(",");
 
     //타이머 변수
     private static int mm;
@@ -88,6 +89,7 @@ public class ChatServer {
                     t.start();
                     if (nameArr.size() == playUserCnt) {
                         TimerRuning();
+                        setTopic();
                     }
 
                     // 제시어 초기화 여부 확인
@@ -157,7 +159,10 @@ public class ChatServer {
         writer.println("Time : " + currentTime);
         writer.flush();;
     }
-
+    public static void broadcastTopic(PrintWriter writer, String topics){
+        writer.println("Topic : " + topics);
+        writer.flush();;
+    }
     public static void TimerRuning() {
         p_display = new Thread(() -> {
             while (p_display == Thread.currentThread()) {
@@ -182,6 +187,16 @@ public class ChatServer {
         p_display.start();
     }
 
+    public static void setTopic(){
+        int rowCount = topics.length;
+
+        double random = Math.random();
+        int randomValue = (int) (random * rowCount + 1);
+        for (PrintWriter writer : clientMap.keySet()) {
+            broadcastTopic(writer, topics[randomValue]);
+        }
+
+    }
     static class ClientHandler implements Runnable {
         private Socket clientSocket;
         private PrintWriter writer;
