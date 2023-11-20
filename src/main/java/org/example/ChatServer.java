@@ -71,6 +71,7 @@ public class ChatServer {
                             }
                         }
                         broadcastMessage("게임시작");
+                        sendRepaint();
                     }
 
 
@@ -92,6 +93,12 @@ public class ChatServer {
     private static void SendName(String username) {
         for (PrintWriter writer : clientMap.keySet()) {
             broadcastName(writer, username);
+        }
+    }
+
+    private static void sendRepaint(){
+        for (PrintWriter writer : clientMap.keySet()) {
+            broadcastRepaint(writer);
         }
     }
 
@@ -140,6 +147,11 @@ public class ChatServer {
     }
     public static void broadcastTopic(PrintWriter writer, String topics){
         writer.println("Topic : " + topics);
+        writer.flush();
+    }
+
+    public static void broadcastRepaint(PrintWriter writer){
+        writer.println("repaint");
         writer.flush();;
     }
     public static void TimerRuning() {
