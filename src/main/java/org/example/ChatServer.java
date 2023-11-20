@@ -23,8 +23,6 @@ public class ChatServer {
     private static int t = 0;
     private static String currentTime;
     private static Thread p_display;
-
-<<<<<<< HEAD
     // 제시어
     private static boolean isUsedChance = false;// 제시어변경 완료
     private static ArrayList<String> topicArr = new ArrayList<>();
