@@ -25,6 +25,7 @@ public class ChatServer {
     private static String currentTime;
     private static Thread p_display;
 
+<<<<<<< HEAD
     // 제시어
     private static boolean isUsedChance = false;// 제시어변경 완료
     private static ArrayList<String> topicArr = new ArrayList<>();
@@ -32,8 +33,8 @@ public class ChatServer {
     private static String currentTopic;
     private static int correctTopicNum = 0;
     private static int clearTopicNum = 5;
-    static String[] topics = "퇴학,우거지,피고인,핵가족,연장전,포크레인,바이오리듬,삼국시대,시험관아기,풍년,새우젓,프라이드 치킨,열매,소방관,전사자,태양,카레이서,개인기,가로수,사시나무,쥐불놀이,가격표,공중전화,불똥,양반,양팔,잠수,초등학교,철종경기,코너킥,티눈,귓속말,백수,원빈,줄다리기,토양,초음파검사,창조물,창업자,작은북,중고생,손맛".split(",");
     private static boolean isInit = false;
+    private static int rightCnt = 0;
 
 
     public static void main(String[] args) {
@@ -81,6 +82,7 @@ public class ChatServer {
                             }
                         }
                         broadcastMessage("게임시작");
+                        sendRepaint();
                     }
 
 
@@ -113,6 +115,12 @@ public class ChatServer {
     private static void SendName(String username) {
         for (PrintWriter writer : clientMap.keySet()) {
             broadcastName(writer, username);
+        }
+    }
+
+    private static void sendRepaint(){
+        for (PrintWriter writer : clientMap.keySet()) {
+            broadcastRepaint(writer);
         }
     }
 
@@ -161,7 +169,17 @@ public class ChatServer {
     }
     public static void broadcastTopic(PrintWriter writer, String topics){
         writer.println("Topic : " + topics);
+        writer.flush();
+    }
+
+    public static void broadcastRepaint(PrintWriter writer){
+        writer.println("repaint");
         writer.flush();;
+    }
+
+    public static void broadcastRight(PrintWriter writer, int rightCnt){
+        writer.println("right : " + rightCnt);
+        writer.flush();
     }
     public static void TimerRuning() {
         p_display = new Thread(() -> {
@@ -226,6 +244,9 @@ public class ChatServer {
                         processExit(message);
                     } else if(message.startsWith("topic")){
                         setTopic();
+                    } else if(message.equals("right")){
+                        rightCnt++;
+                        processRight(rightCnt);
                     }
                     else {
                         broadcastMessage(username, message);
@@ -268,6 +289,12 @@ public class ChatServer {
 
         private void processClearMessage(){
             broadcastClear();
+        }
+
+        private void processRight(int rightCnt){
+            for (PrintWriter writer : clientMap.keySet()) {
+                broadcastRight(writer, rightCnt);
+            }
         }
 
         private void processExit(String message){
