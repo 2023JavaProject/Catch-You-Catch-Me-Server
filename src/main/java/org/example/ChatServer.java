@@ -173,7 +173,7 @@ public class ChatServer {
 
     public static void broadcastRepaint(PrintWriter writer){
         writer.println("repaint");
-        writer.flush();;
+        writer.flush();
     }
 
     public static void broadcastRight(PrintWriter writer, int rightCnt){
@@ -246,6 +246,7 @@ public class ChatServer {
                     } else if(message.equals("right")){
                         rightCnt++;
                         processRight(rightCnt);
+
                     }
                     else {
                         broadcastMessage(username, message);
@@ -293,6 +294,7 @@ public class ChatServer {
         private void processRight(int rightCnt){
             for (PrintWriter writer : clientMap.keySet()) {
                 broadcastRight(writer, rightCnt);
+                broadcastRepaint(writer);
             }
         }
 
