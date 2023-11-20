@@ -32,6 +32,7 @@ public class ChatServer {
     private static int clearTopicNum = 5;
     private static boolean isInit = false;
     private static int rightCnt = 0;
+    private static int changeCnt = 0;
 
 
     public static void main(String[] args) {
@@ -174,6 +175,10 @@ public class ChatServer {
         writer.flush();
     }
 
+    public static void broadcastNotChange(PrintWriter writer){
+        writer.println("NotChange");
+        writer.flush();
+    }
     public static void broadcastRight(PrintWriter writer, int rightCnt){
         writer.println("right : " + rightCnt);
         writer.flush();
@@ -240,7 +245,15 @@ public class ChatServer {
                     } else if(message.startsWith("exit")){
                         processExit(message);
                     } else if(message.startsWith("topic")){
-                        setTopic();
+                        if(message.equals("topic_change")){
+                            changeCnt++;
+                        }
+                        if(changeCnt > 1){
+                            processTopicChange();
+                            changeCnt=1;
+                        } else{
+                            setTopic();
+                        }
                     } else if(message.equals("right")){
                         rightCnt++;
                         processRight(rightCnt);
@@ -289,6 +302,9 @@ public class ChatServer {
             broadcastClear();
         }
 
+        private void processTopicChange(){
+            broadcastNotChange(writer);
+        }
         private void processRight(int rightCnt){
             for (PrintWriter writer : clientMap.keySet()) {
                 broadcastRight(writer, rightCnt);
