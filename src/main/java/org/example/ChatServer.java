@@ -24,6 +24,16 @@ public class ChatServer {
     private static String currentTime;
     private static Thread p_display;
 
+    // 제시어
+    private static boolean isUsedChance = false;// 제시어변경 완료
+    private static ArrayList<String> topicArr = new ArrayList<>();
+    private static ArrayList<String> topicUsedArr = new ArrayList<>();
+    private static String currentTopic;
+    private static int correctTopicNum = 0;
+    private static int clearTopicNum = 5;
+    static String[] topics = "퇴학,우거지,피고인,핵가족,연장전,포크레인,바이오리듬,삼국시대,시험관아기,풍년,새우젓,프라이드 치킨,열매,소방관,전사자,태양,카레이서,개인기,가로수,사시나무,쥐불놀이,가격표,공중전화,불똥,양반,양팔,잠수,초등학교,철종경기,코너킥,티눈,귓속말,백수,원빈,줄다리기,토양,초음파검사,창조물,창업자,작은북,중고생,손맛".split(",");
+    private static boolean isInit = false;
+
 
     public static void main(String[] args) {
         try {
@@ -78,6 +88,17 @@ public class ChatServer {
                     t.start();
                     if (nameArr.size() == playUserCnt) {
                         TimerRuning();
+                    }
+
+                    // 제시어 초기화 여부 확인
+                    if ( !isInit ) {
+                        // 제시어 초기화
+                        for (String s : topics) {
+                            topicArr.add(s);
+                            System.out.println(s);
+                        }
+                        ClientHandler.changeTopic();// 제시어 기초 세팅
+                        isInit = true;
                     }
                 }
 
@@ -202,6 +223,18 @@ public class ChatServer {
                 broadcastMessage(username+"님이 나가셨습니다.");
             }
         }
+        static void changeTopic() {
+            // currentTopic을 초기화
+            currentTopic = topicArr.get((int) (Math.random() * topicArr.size()));
+
+            // 제시어 중복 확인
+            while (topicUsedArr.contains(currentTopic)) {
+                currentTopic = topicArr.get((int) (Math.random() * topicArr.size()));
+            }
+            System.out.println("중복이 아닙니다."+currentTopic);
+            topicUsedArr.add(currentTopic);
+        }
+
         private void processDrawingMessage(String message) {
             // Format: "draw:x1,y1,x2,y2,color,penSize"
             String[] parts = message.substring(5).split(",");
